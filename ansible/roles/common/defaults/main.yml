@@ -1,0 +1,27 @@
+# ===================================================================================
+# File: ansible/roles/common/defaults/main.yml
+# 
+# Deskripsi:
+#   File ini berisi variabel-variabel default (defaults) yang digunakan oleh role "common".
+#   Variabel-variabel ini dapat di-override dari playbook atau dari host/group vars jika diperlukan.
+#
+#   Dokumentasi variabel:
+#   - timezone:            Timezone yang akan diset di sistem.
+#   - common_packages:     Daftar paket umum yang akan di-install ke target host.
+#   - enable_guest_agent:  Mengaktifkan atau menonaktifkan qemu-guest-agent (boolean).
+# ===================================================================================
+
+timezone: "Asia/Jakarta"
+
+common_packages:
+  - qemu-guest-agent    # Agent untuk integrasi guest VM (misal: Proxmox, KVM)
+  - curl                # Tool untuk transfer data dengan URL
+  - vim                 # Teks editor berbasis command line
+  - htop                # Monitoring interaktif untuk proses sistem
+  - chrony              # Sinkronisasi waktu (NTP client/server)
+  - gnupg               # GNU Privacy Guard (manajemen kunci dan enkripsi)
+  - apt-transport-https # Mendukung download paket lewat HTTPS di apt
+  - ca-certificates     # Sertifikat CA untuk HTTPS
+
+enable_guest_agent: true # Mengaktifkan atau menonaktifkan qemu-guest-agent (boolean).
+enable_hardening: true # Mengaktifkan atau menonaktifkan hardening (boolean).

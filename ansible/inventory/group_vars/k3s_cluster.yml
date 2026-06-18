@@ -1,0 +1,52 @@
+# ===========================================================
+# File: ansible/groups_vars/k3s_cluster.yml
+# Dokumentasi:
+#
+# File ini berisi variabel-variabel yang digunakan untuk
+# mengkonfigurasi cluster K3s menggunakan Ansible.
+#
+# Penjelasan variabel:
+# - k3s_release_version: Versi K3s yang akan diinstall.
+# - k3s_become: Apakah Ansible akan menggunakan sudo.
+# - k3s_etcd_datastore: Mengaktifkan backend datastore etcd.
+# - k3s_registration_address: Alamat IP server utama K3s.
+# - k3s_server: Pengaturan server K3s.
+#     - disable: Menonaktifkan komponen tertentu (servicelb, traefik).
+#     - tls-san: IP/FQDN tambahan untuk sertifikat TLS API server.
+#     - node-taint: Daftar taint node.
+#     - kubelet-arg: Argumen tambahan untuk kubelet di server.
+# - k3s_agent: Pengaturan agent node (worker).
+#     - kubelet-arg: Argumen tambahan untuk kubelet pada agent/workers.
+# - k3s_server_manifests_templates: Daftar template manifest yang akan di-deploy otomatis di server.
+# - k3s_token: Token bootstrap; disarankan diambil dari vault/ansible vault.
+# ===========================================================
+
+k3s_release_version: "v1.30.5+k3s1" # Versi K3s yang akan dipasang
+k3s_become: true                   # Gunakan privilege escalation (sudo)
+
+k3s_etcd_datastore: true           # Aktifkan datastore etcd untuk HA
+k3s_registration_address: "192.168.1.20" # IP utama API server K3s
+
+k3s_server:
+  disable:
+    - servicelb                  # Matikan addon servicelb
+    - traefik                    # Matikan addon traefik bawaan
+  tls-san:
+    - "192.168.1.20"             # SAN tambahan sertifikat
+  node-taint: []                  # Tidak ada taint pada node oleh default
+  kubelet-arg:
+    - "kube-reserved=cpu=300m,memory=512Mi"    # Reservasi sumber daya untuk kubelet (server)
+    - "system-reserved=cpu=300m,memory=512Mi"  # Reservasi sumber daya untuk sistem (server)
+    - "eviction-hard=memory.available<256Mi"    # Threshold eviction
+
+k3s_agent:
+  kubelet-arg:
+    - "kube-reserved=cpu=300m,memory=384Mi"    # Reservasi sumber daya untuk kubelet (agent)
+    - "system-reserved=cpu=300m,memory=384Mi"  # Reservasi sumber daya untuk sistem (agent)
+    - "eviction-hard=memory.available<256Mi"    # Threshold eviction
+
+k3s_server_manifests_templates:
+  - "../templates/kube-vip-rbac.yaml.j2"            # Manifest RBAC untuk kube-vip
+  - "../templates/kube-vip-daemonset.yaml.j2"       # Manifest kube-vip daemonset
+
+k3s_token: "{{ vault_k3s_token }}"                # Token registrasi K3s (dianjurkan dari Vault)

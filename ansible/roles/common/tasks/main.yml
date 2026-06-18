@@ -1,0 +1,103 @@
+# ===================================================================================
+# File: ansible/roles/common/tasks/main.yml
+#
+# Deskripsi:
+#   Task file ini berisi tugas-tugas otomatisasi yang dijalankan oleh role "common"
+#   untuk menyiapkan host Linux agar siap digunakan, terutama untuk environment
+#   berbasis Kubernetes atau VM. Task ini meliputi update sistem, instalasi paket,
+#   pengaturan waktu, kernel & sysctl, serta hardening dasar.
+#
+#   Penjelasan task:
+#   - Update cache dan upgrade apt package
+#   - Instalasi paket dasar dari variabel common_packages
+#   - Set timezone sesuai variabel timezone
+#   - Aktifkan dan enable service chrony & qemu-guest-agent
+#   - Matikan swap baik sementara maupun permanen di fstab
+#   - Pastikan overlay & br_netfilter dimuat saat boot
+#   - Load kernel modul sekarang
+#   - Set sysctl khusus kebutuhan Kubernetes (bridge & ip_forward)
+#   - Opsional (dengan enable_hardening): aktifkan fail2ban dan unattended-upgrades
+#
+#   File ini dapat dimodifikasi atau dikembangkan sesuai kebutuhan lingkungan Anda.
+# ===================================================================================
+
+- name: Update apt cache & upgrade paket
+  ansible.builtin.apt:
+    update_cache: true
+    upgrade: dist
+    cache_valid_time: 3600
+
+- name: Instal paket dasar (defined in common_packages)
+  ansible.builtin.apt:
+    name: "{{ common_packages }}"
+    state: present
+
+- name: Set timezone sistem
+  community.general.timezone:
+    name: "{{ timezone }}"
+
+- name: Aktifkan dan enable chrony & qemu-guest-agent
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    enabled: true
+    state: started
+    masked: false
+  loop:
+    - chrony
+    - qemu-guest-agent
+  when: not ansible_check_mode
+
+- name: Nonaktifkan swap untuk saat ini
+  ansible.builtin.command: swapoff -a
+  when: ansible_swaptotal_mb > 0
+  changed_when: false
+
+- name: Komentar baris swap di /etc/fstab (nonaktifkan swap permanen)
+  ansible.builtin.replace:
+    path: /etc/fstab
+    regexp: '^([^#].*?\sswap\s+sw\s+.*)$'
+    replace: '# \1'
+
+- name: Pastikan modul kernel overlay dan br_netfilter ter-load saat boot
+  ansible.builtin.copy:
+    dest: /etc/modules-load.d/k8s.conf
+    content: |
+      overlay
+      br_netfilter
+    mode: '0644'
+
+- name: Load kernel module overlay & br_netfilter sekarang juga
+  community.general.modprobe:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - overlay
+    - br_netfilter
+
+- name: Set sysctl untuk kebutuhan Kubernetes (bridge & ip_forward)
+  ansible.posix.sysctl:
+    name: "{{ item.key }}"
+    value: "{{ item.value }}"
+    sysctl_file: /etc/sysctl.d/99-kubernetes.conf
+    reload: true
+    state: present
+  loop:
+    - {key: net.bridge.bridge-nf-call-iptables, value: 1}
+    - {key: net.bridge.bridge-nf-call-ip6tables, value: 1}
+    - {key: net.ipv4.ip_forward, value: 1}
+
+
+- name: install fail2ban & unattended-upgrades
+  ansible.builtin.apt:
+    name:
+      - fail2ban
+      - unattended-upgrades
+    state: present
+  when: not ansible_check_mode
+
+- name: aktifkan fail2ban jika hardening diaktifkan
+  ansible.builtin.systemd:
+    name: fail2ban
+    enabled: true
+    state: started
+  when: enable_hardening | bool

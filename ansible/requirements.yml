@@ -1,0 +1,8 @@
+---
+roles:
+  - name: xanmanning.k3s
+    version: v3.6.4
+
+collections:
+  - name: community.general
+  - name: ansible.posix

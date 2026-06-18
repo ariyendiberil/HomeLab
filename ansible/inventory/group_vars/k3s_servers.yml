@@ -1,0 +1,18 @@
+# ===================================================================================
+# File: ansible/groups_vars/k3s_servers.yml
+#
+# Deskripsi:
+#   File variabel grup untuk host yang tergabung dalam grup "k3s_servers".
+#   Variabel di bawah ini akan otomatis tersedia untuk host-member grup ini.
+#
+#   - k3s_control_node: 
+#       Digunakan untuk menandai node sebagai "control plane" atau "server".
+#       Nilai 'true' berarti node ini perannya sebagai k3s server (control-plane), 
+#       sehingga akan menjalankan service k3s-server dan memiliki tanggung jawab
+#       scheduling, dsb.
+#
+#   Biasanya file ini digunakan untuk mengatur variabel yang hanya berlaku 
+#   di semua k3s server (control-plane/master), dan bisa berbeda dari node worker.
+# ===================================================================================
+
+k3s_control_node: true
