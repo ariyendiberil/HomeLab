@@ -1,3 +1,24 @@
+# =============================================================================
+#  ArgoCD Application: metallb-config (Manifests Config MetalLB)
+#  -------------------------------------------------------------
+#  File ini mendefinisikan konfigurasi MetalLB (seperti IPAddressPool,
+#  L2Advertisement, dsb) yang diterapkan setelah MetalLB utama telah tersedia.
+# 
+#  Penggunaan:
+#  - File ini digunakan bersama ArgoCD untuk menerapkan manifest konfigurasi
+#    MetalLB yang berada di repo utama (di path: kubernetes/platform/metallb-config).
+#  - Nilai sync-wave "1" memastikan bahwa konfigurasi ini baru diterapkan setelah
+#    MetalLB core terinstall (aplikasi utama MetalLB harus sync-wave lebih rendah, ex: "0").
+#  - Pastikan setiap perubahan di direktori kubernetes/platform/metallb-config
+#    sudah sesuai dengan resource dan versi MetalLB yang sedang digunakan.
+#
+#  Penjelasan field utama:
+#  - repoURL: Sumber Git repository untuk file-file config MetalLB.
+#  - targetRevision: Branch atau commit yang digunakan.
+#  - path: Direktori di repo git yang memuat manifest MetalLB Config.
+#  - destination: Namespace target (default: metallb-system).
+#  - syncPolicy: Aturan sync aplikasi di ArgoCD, termasuk auto-repair & prune.
+# =============================================================================
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -20,3 +41,4 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+ 
