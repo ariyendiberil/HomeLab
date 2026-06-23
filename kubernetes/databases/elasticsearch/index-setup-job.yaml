@@ -20,7 +20,7 @@ spec:
             - -ec
             - |
               ES="http://banking-search-es-http.banking-search.svc:9200"
-              PASS=$(cat /etc/es-password/password)
+              PASS=$(cat /etc/es-password/elastic)
               until curl -sf -u "elastic:${PASS}" "${ES}/_cluster/health"; do
                 echo "waiting for elasticsearch..."
                 sleep 15
