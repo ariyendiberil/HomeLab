@@ -18,6 +18,7 @@ ansible/inventory/group_vars/vault.yaml
 vault-password*
 .vault_pass*
 kubernetes/databases/redis/auth-secret.yaml
+kubernetes/monitoring/grafana-admin-secret.yaml
 
 # ---- Terraform ----
 .terraform/
