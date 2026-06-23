@@ -10,6 +10,12 @@ spec:
   roles:
     - controller
     - broker
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+    limits:
+      memory: 1536Mi
   storage:
     type: jbod
     volumes:
