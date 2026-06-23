@@ -1,0 +1,42 @@
+# Applied after Elasticsearch cluster is green — creates banking search indices.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: banking-search-index-setup
+  namespace: banking-search
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  ttlSecondsAfterFinished: 300
+  backoffLimit: 6
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: setup
+          image: curlimages/curl:8.11.1
+          command:
+            - /bin/sh
+            - -ec
+            - |
+              ES="http://banking-search-es-http.banking-search.svc:9200"
+              PASS=$(cat /etc/es-password/password)
+              until curl -sf -u "elastic:${PASS}" "${ES}/_cluster/health"; do
+                echo "waiting for elasticsearch..."
+                sleep 15
+              done
+              curl -sf -u "elastic:${PASS}" -X PUT "${ES}/banking-transactions" \
+                -H 'Content-Type: application/json' \
+                -d '{"settings":{"number_of_shards":3,"number_of_replicas":1}}'
+              curl -sf -u "elastic:${PASS}" -X PUT "${ES}/banking-customers" \
+                -H 'Content-Type: application/json' \
+                -d '{"settings":{"number_of_shards":2,"number_of_replicas":1}}'
+              echo "indices ready"
+          volumeMounts:
+            - name: es-password
+              mountPath: /etc/es-password
+              readOnly: true
+      volumes:
+        - name: es-password
+          secret:
+            secretName: banking-search-es-elastic-user
