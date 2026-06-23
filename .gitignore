@@ -17,6 +17,7 @@ ansible/inventory/group_vars/vault.yml
 ansible/inventory/group_vars/vault.yaml
 vault-password*
 .vault_pass*
+kubernetes/databases/redis/auth-secret.yaml
 
 # ---- Terraform ----
 .terraform/
