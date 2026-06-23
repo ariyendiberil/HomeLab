@@ -1,5 +1,5 @@
-# Loki monolithic — homelab (filesystem, 7d retention)
-deploymentMode: Monolithic
+# Loki single-binary — homelab (filesystem, 7d retention)
+deploymentMode: SingleBinary
 
 loki:
   auth_enabled: false
@@ -67,13 +67,14 @@ gateway:
 minio:
   enabled: false
 
+lokiCanary:
+  enabled: false
+
 monitoring:
   selfMonitoring:
     enabled: false
     grafanaAgent:
       installOperator: false
-  lokiCanary:
-    enabled: false
 
 test:
   enabled: false
