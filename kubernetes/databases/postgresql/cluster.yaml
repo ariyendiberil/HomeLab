@@ -20,8 +20,6 @@ spec:
     initdb:
       database: banking
       owner: banking_app
-      secret:
-        name: banking-db-app-user
 
   storage:
     size: 20Gi
