@@ -79,3 +79,36 @@ variable "nodes" {
         "k3s-agent-2"  = {target_node = "elitdesk",    vmid = 125, role = "agent",  cores = 4, memory = 12288, disk_gb = 40, ip = "192.168.1.25"}
     }
 }
+
+# ---- Cloudflare DNS (Fase 13, optional) ----
+
+variable "enable_cloudflare_dns" {
+  type        = bool
+  default     = false
+  description = "Set true to manage public app DNS via Cloudflare (wildcard CNAME to tunnel)."
+}
+
+variable "cf_api_token" {
+  type        = string
+  sensitive   = true
+  default     = ""
+  description = "Cloudflare API token (Zone DNS Edit + Account Cloudflare Tunnel Read)."
+}
+
+variable "cf_zone_id" {
+  type        = string
+  default     = ""
+  description = "Cloudflare zone ID for the public domain."
+}
+
+variable "domain" {
+  type        = string
+  default     = ""
+  description = "Public domain, e.g. lab.example.com."
+}
+
+variable "cloudflare_tunnel_cname" {
+  type        = string
+  default     = ""
+  description = "Tunnel CNAME target, e.g. <tunnel-id>.cfargotunnel.com (from Zero Trust after creating tunnel)."
+}

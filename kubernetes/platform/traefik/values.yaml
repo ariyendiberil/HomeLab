@@ -1,0 +1,61 @@
+# Traefik ingress — homelab (MetalLB .40, edge node agent-2)
+deployment:
+  replicas: 1
+
+# Prefer lightweight edge node (EliteDesk / k3s-agent-2)
+nodeSelector:
+  kubernetes.io/hostname: k3s-agent-2
+
+tolerations: []
+
+ingressClass:
+  enabled: true
+  isDefaultClass: true
+  name: traefik
+
+providers:
+  kubernetesCRD:
+    enabled: true
+    allowCrossNamespace: true
+  kubernetesIngress:
+    enabled: true
+    allowExternalNameServices: true
+
+ports:
+  web:
+    port: 8000
+    expose:
+      default: true
+    exposedPort: 80
+    protocol: TCP
+  websecure:
+    port: 8443
+    expose:
+      default: false
+    exposedPort: 443
+    protocol: TCP
+    tls:
+      enabled: true
+
+service:
+  enabled: true
+  type: LoadBalancer
+  spec:
+    loadBalancerIP: 192.168.1.40
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    memory: 256Mi
+
+logs:
+  general:
+    level: INFO
+  access:
+    enabled: false
+
+globalArguments: []
+additionalArguments:
+  - "--providers.kubernetesingress.ingressendpoint.publishedservice=platform/traefik"

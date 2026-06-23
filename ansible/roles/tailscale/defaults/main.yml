@@ -1,0 +1,6 @@
+---
+tailscale_enabled: true
+tailscale_authkey: "{{ vault_tailscale_authkey | default('') }}"
+tailscale_hostname: "{{ inventory_hostname }}"
+tailscale_advertise_tags: ""
+tailscale_extra_args: "--accept-routes --accept-dns=false"

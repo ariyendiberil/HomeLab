@@ -1,0 +1,6 @@
+# Tailscale — admin VPN (Proxmox, k3s API, Grafana, ArgoCD via 100.x)
+# Set vault_tailscale_authkey in ansible/inventory/group_vars/vault.yml
+---
+tailscale_enabled: true
+tailscale_advertise_tags: ""
+tailscale_extra_args: "--accept-routes --accept-dns=false"

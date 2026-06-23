@@ -19,6 +19,10 @@ terraform {
       source  = "bpg/proxmox"
       version = "~> 0.66"
     }
+    cloudflare = {
+      source  = "cloudflare/cloudflare"
+      version = "~> 5.0"
+    }
   }
 }
 
@@ -37,4 +41,8 @@ provider "proxmox" {
         # Path ke file private key SSH, pastikan file ini tersedia dan memiliki permission yang benar
         private_key = file("~/.ssh/homelab")
     }
+}
+
+provider "cloudflare" {
+  api_token = var.cf_api_token
 }

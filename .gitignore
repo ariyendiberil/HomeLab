@@ -35,6 +35,7 @@ crash.*.log
 ansible/inventory/hosts.ini
 ansible/roles/*
 !ansible/roles/common/
+!ansible/roles/tailscale/
 
 # ---- OS / editor junk ----
 .DS_Store
