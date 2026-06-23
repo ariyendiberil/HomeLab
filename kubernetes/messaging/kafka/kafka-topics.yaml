@@ -1,0 +1,27 @@
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: banking.transactions
+  namespace: banking-messaging
+  labels:
+    strimzi.io/cluster: banking-kafka
+spec:
+  partitions: 3
+  replicas: 3
+  config:
+    retention.ms: 604800000
+    min.insync.replicas: 2
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: banking.events
+  namespace: banking-messaging
+  labels:
+    strimzi.io/cluster: banking-kafka
+spec:
+  partitions: 3
+  replicas: 3
+  config:
+    retention.ms: 604800000
+    min.insync.replicas: 2
